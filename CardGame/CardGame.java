@@ -6,17 +6,21 @@
 package CardGame;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.Collections;
+import java.util.ArrayList;
+import java.lang.Enum;
 
 /**
  * Created by ghost on 2016/10/26.
  */
 public class CardGame {
-    public static int PLAYER_NUM=2;
-    public static int CARD_NUM=2;//玩家手牌数
+    public static int PLAYER_NUM=3;
+    public static int CARD_NUM=6;//玩家手牌数
     public ArrayList<Card> cards=new ArrayList<Card>();
     public HashMap<String,Card> hm=new HashMap<String, Card>();
     HashMap<Enum,Card> ec;
     public ArrayList<Player>pl=new ArrayList<Player>();
+
     public static void main(String[] args){
         CardGame that=new CardGame();
 
@@ -33,7 +37,7 @@ public class CardGame {
         }
         //比较
         that.CompareCards(that.cards.get(0),that.cards.get(1));
-        System.out.println("比较结果：" + that.CompareCards(that.cards.get(0),that.cards.get(1)).getNumber());
+        System.out.println("比较结果：" + that.CompareCards(that.cards.get(0), that.cards.get(1)));
         System.out.println("\n============开始洗牌===========");
         //洗牌
           that.WashCards(that.cards);
@@ -44,6 +48,7 @@ public class CardGame {
             System.out.print("["+c0.getFlower()+c0.getNumber()+"]");
         }
         System.out.print("\n");
+
         //创建玩家
         System.out.println("=========创建玩家...===========\n");
 
@@ -209,29 +214,45 @@ public class CardGame {
         System.out.println("=========拿牌结束==========");
 
     }
-    public void GameResult( ArrayList<Player> pl){
-        ArrayList<Card> Max =new ArrayList<Card>();
-        for(int i=0;i<pl.size();i++) {
+    public void GameResult( ArrayList<Player> pl) {
+        ArrayList<Card> Max = new ArrayList<Card>();
+        for (int i = 0; i < pl.size(); i++) {
             Card max;
-           Player p=pl.get(i);
-            max=CompareCards(p.getCards().get(0), p.getCards().get(1));
+            Player p = pl.get(i);
+            //降序排序
+            Collections.sort(p.getCards(), new SortCards());
+            max = p.getCards().get(0);
             Max.add(max);
+            System.out.println("玩家" + p.getName() + "最大牌为:[" + Max.get(i).getFlower() + Max.get(i).getNumber() + "]");
 
         }
-        System.out.println("玩家1最大牌为:["+Max.get(0).getFlower()+Max.get(0).getNumber()+"]");
-        System.out.println("玩家2最大牌为:["+Max.get(1).getFlower()+Max.get(1).getNumber()+"]");
-            Card winCard;
-            winCard=CompareCards(Max.get(0),Max.get(1));
+        //Card winCar;
+        //winCard=CompareCards(Max.get(0),Max.get(1))?Max.get(0):Max.get(1);
+        ArrayList<Card> Result = new ArrayList<Card>();
+        for (int i = 0; i <Max.size() ; i++) {
+            Result.add(Max.get(i));
+        }
+        //Result.indexOf()
+        Collections.sort(Max, new SortCards());
+        Card BigMax = Max.get(0);
+        int index = Result.indexOf(BigMax);
+
+        Player winner = pl.get(index);
+
+        System.out.println("玩家" + winner.getName() + "获胜");
+
+
+        }
        // System.out.println("玩家2最大牌为"+Max.get(1));
-        if(winCard.equals(Max.get(0))){
+       /* if(winCard.equals(Max.get(0))){
             System.out.println("玩家1获胜");
         }else {
             System.out.println("玩家2获胜");
-        }
+        }*/
 
 
-    }
-    public Card CompareCards(Card a,Card b){
+
+    public boolean CompareCards(Card a,Card b){
         boolean flag=false;//a>b?
         //三目比较
         int numKey;
@@ -275,7 +296,7 @@ public class CardGame {
                             }
                         }
                     default:
-                        switch (a.getFlo().compareTo(b.getFlo())){
+                        switch (floKey){
                             case -1://a的花色枚举在b之前
                                 flag=false;break;
                             case 1:
@@ -286,10 +307,8 @@ public class CardGame {
                 }
 
         }
-        if(flag){
-            return a;
-        }else return b;
-        //return a;
+
+        return flag;
 
     }
 
@@ -303,14 +322,17 @@ public class CardGame {
              RE,
              BL
 
+
+
 }
 enum NumberEnum{
             N,J,Q,K,A
 
 }
-class Card{
+class Card implements Comparable<Card>{
     public String getFlower() {
         return flower;
+
     }
 
     public void setFlower(String flower) {
@@ -349,6 +371,16 @@ class Card{
     }
 
     private String number;
+
+    @Override
+    public int compareTo(Card o) {
+        CardGame cg=new CardGame();
+
+        if(cg.CompareCards(this, o)){
+            return -1;
+        }else
+        return 1;
+    }
 }
 class Player{
     private int ID;
@@ -382,3 +414,13 @@ class Player{
     private ArrayList<Card> cards;
 
 }
+     class SortCards implements Comparator{
+
+         @Override
+         public int compare(Object o1, Object o2) {
+             //CardGame cg=new CardGame();
+             Card c1=(Card)o1;
+             Card c2=(Card)o2;
+            return c1.compareTo(c2);
+         }
+     }
