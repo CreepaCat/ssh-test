@@ -1,7 +1,3 @@
 git test
 test
-<<<<<<< HEAD
-tow branch
-=======
-tow branch test
->>>>>>> dev
+this is dev
