@@ -2,5 +2,5 @@ git test
 test
 this is dev
 fast forward merge
-bug test
-this is my dev
+dev 协作提交
+
